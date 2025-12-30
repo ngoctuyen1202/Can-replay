@@ -1,0 +1,9 @@
+=== CAN Replay Start ===
+EXCLUDED by sender EngineECU id=256
+SEND RAW ID=512 DLC=1
+Sent ID=0x200
+EXCLUDED by sender EngineECU id=256
+SEND RAW ID=512 DLC=1
+Sent ID=0x200
+EXCLUDED by sender EngineECU id=256
+=== CAN Replay End ===
