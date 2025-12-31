@@ -1,9 +1,45 @@
 === CAN Replay Start ===
-EXCLUDED by sender EngineECU id=256
-SEND RAW ID=512 DLC=1
-Sent ID=0x200
-EXCLUDED by sender EngineECU id=256
-SEND RAW ID=512 DLC=1
-Sent ID=0x200
-EXCLUDED by sender EngineECU id=256
+SKIP LINE: date Wed Jan 01 12:00:00.000 2026
+SKIP LINE: base hex  timestamps absolute
+SKIP LINE: internal events logged
+SKIP LINE: // version 0.1
+SKIP LINE: Begin Triggerblock Wed Jan 01 12:00:00.000 2026
+SKIP LINE:    0.000000 Start of measurement
+SKIP LINE:    0.010000 CAN 1 Status:chip status active
+SKIP LINE: 
+SKIP LINE:    // GPSLatLong - Classic
+EXCLUDED by sender ChassisBus id=2(dec)
+EXCLUDED by sender ChassisBus id=2(dec)
+SKIP LINE: 
+SKIP LINE:    // GPSAltitude - Classic
+SEND RAW ID=3 DLC=2
+Sent ID=0x3
+SEND RAW ID=3 DLC=2
+Sent ID=0x3
+SKIP LINE: 
+SKIP LINE:    // SOC - Classic
+SEND RAW ID=4 DLC=8
+Sent ID=0x4
+SEND RAW ID=4 DLC=8
+Sent ID=0x4
+SKIP LINE: 
+SKIP LINE:    // GPSSpeed - CAN FD
+SEND RAW ID=5 DLC=0
+Sent ID=0x5
+SEND RAW ID=5 DLC=0
+Sent ID=0x5
+SKIP LINE: 
+SKIP LINE:    // BatteryCurrent - CAN FD
+SEND RAW ID=6 DLC=0
+Sent ID=0x6
+SEND RAW ID=6 DLC=0
+Sent ID=0x6
+SKIP LINE: 
+SKIP LINE:    // PowerState - Classic
+SEND RAW ID=7 DLC=2
+Sent ID=0x7
+SEND RAW ID=7 DLC=2
+Sent ID=0x7
+SKIP LINE: 
+SKIP LINE: End TriggerBlock
 === CAN Replay End ===

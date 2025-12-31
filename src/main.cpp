@@ -8,14 +8,13 @@
 #include "asc_parser.h"
 #include "can_socket.h"
 
-int main()
+int main(int argc, char** argv)
 {
     // Use default files and interface
-    std::string dbc_file = "dbc/vehicle.dbc";
+    std::string dbc_file = "dbc/test.dbc";
     std::string log_file = "log_input/input.asc";
     std::string ifname = "vcan0";
-    std::string exclude_sender = "EngineECU"; // empty = no exclude
-    std::string include_sender; // empty = include all
+    std::string exclude_sender = "ChassisBus";
     std::string program_log = "replay_output/replay_program.log";
 
     DbcParser dbc(dbc_file);
@@ -48,19 +47,14 @@ int main()
             continue;
         }
 
-        // Apply include/exclude filters by sender name in DBC
+        // Apply exclude filters by sender name in DBC
         if (!exclude_sender.empty()) {
             if (dbc.matchSender(f.can_id, exclude_sender)) {
-                flog << "EXCLUDED by sender " << exclude_sender << " id=" << f.can_id << "\n";
+                flog << "EXCLUDED by sender " << exclude_sender << " id=" << f.can_id << "(dec)"<<"\n";
                 continue;
             }
         }
-        if (!include_sender.empty()) {
-            if (!dbc.matchSender(f.can_id, include_sender)) {
-                flog << "SKIPPED (not from include_sender) id=" << f.can_id << "\n";
-                continue;
-            }
-        }
+
 
         if (last_ts >= 0)
             std::this_thread::sleep_for(
