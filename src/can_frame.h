@@ -2,6 +2,7 @@
 #define CAN_FRAME_H
 
 #include <cstdint>
+#include <chrono>
 
 // define constants
 #define CAN_FD_PAYLOAD_MAX           64
@@ -16,6 +17,11 @@ struct CanFrameData {
     uint8_t  data_len;  // actual data length in bytes
     bool     is_fd;     // true if CAN FD frame
     uint8_t  data[CAN_FD_PAYLOAD_MAX]; // max 64 bytes for CAN FD
+};
+
+struct ReplayFrame {
+    CanFrameData frame;                                 // CAN frame data
+    std::chrono::steady_clock::time_point send_time;    // scheduled send time
 };
 
 #endif // CAN_FRAME_H

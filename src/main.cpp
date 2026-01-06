@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 {
     // Use default files and interface
     std::string dbc_file = "dbc/test.dbc";
-    std::string log_file = "log_input/input.asc";
+    std::string log_file = "log_input/event.asc";
     std::string ifname = "vcan0";
     std::string exclude_sender = "ChassisBus";
     std::string program_log = "replay_output/replay_program.log";
@@ -33,41 +33,58 @@ int main(int argc, char** argv)
         return 2;
     }
 
-    std::string line;
-    double last_ts = -1.0;
+    std::vector<ReplayFrame> replay_frames;
 
-    std::cout << "=== CAN Replay Start ===\n";
-    flog << "=== CAN Replay Start ===\n";
+    std::string line;
+    bool first_frame = true;
+    double start_log_ts = 0.0;
 
     while (std::getline(fin, line)) {
         CanFrameData f{};
         if (!asc.parseLine(line, f)) {
-            std::cout << "SKIP LINE: " << line << "\n";
             flog << "SKIP LINE: " << line << "\n";
             continue;
         }
 
-        // Apply exclude filters by sender name in DBC
+        if (first_frame) {
+            start_log_ts = f.timestamp;
+            first_frame = false;
+        }
+
+        replay_frames.push_back({f, {}});
+    }
+    auto start_wall = std::chrono::steady_clock::now();
+
+    for (auto& rf : replay_frames) {
+        double log_delta = rf.frame.timestamp - start_log_ts;
+
+        rf.send_time = start_wall
+                    + std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+                    std::chrono::duration<double>(log_delta));
+    }
+
+    std::cout << "=== CAN Replay Start ===\n";
+    flog << "=== CAN Replay Start ===\n";
+
+    for (const auto& rf : replay_frames) {
+
+        std::this_thread::sleep_until(rf.send_time);
+
+        // Apply exclude filters
         if (!exclude_sender.empty()) {
-            if (dbc.matchSender(f.can_id, exclude_sender)) {
-                flog << "EXCLUDED by sender " << exclude_sender << " id=" << f.can_id << "(dec)"<<"\n";
+            if (dbc.matchSender(rf.frame.can_id, exclude_sender)) {
+                flog << "EXCLUDED by sender " << exclude_sender
+                    << " id=" << rf.frame.can_id << "\n";
                 continue;
             }
         }
+        // Send CAN frame
+        can.send(rf.frame);
 
-
-        if (last_ts >= 0)
-            std::this_thread::sleep_for(
-                std::chrono::duration<double>(f.timestamp - last_ts));
-        last_ts = f.timestamp;
-
-        std::cout << "SEND RAW ID=" << f.can_id << " DLC=" << (int)f.dlc << "\n";
-        flog << "SEND RAW ID=" << f.can_id << " DLC=" << (int)f.dlc << "\n";
-
-        can.send(f);
-
-        std::cout << "Sent ID=0x" << std::hex << f.can_id << std::dec << "\n";
-        flog << "Sent ID=0x" << std::hex << f.can_id << std::dec << "\n";
+        std::cout << "SEND RAW ID=" << rf.frame.can_id
+                << " DLC=" << (int)rf.frame.dlc << "\n";
+        flog << "SEND RAW ID=" << rf.frame.can_id
+            << " DLC=" << (int)rf.frame.dlc << "\n";
     }
 
     std::cout << "=== CAN Replay End ===\n";
