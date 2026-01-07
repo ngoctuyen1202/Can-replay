@@ -1,0 +1,7 @@
+{
+  "dbc_file": "dbc/test.dbc",
+  "log_file": "log_input/event.asc",
+  "ifname": "vcan0",
+  "exclude_sender": "ChassisBus",
+  "program_log": "replay_output/replay_program.log"
+}

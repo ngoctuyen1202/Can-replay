@@ -7,29 +7,32 @@
 #include "dbc_parser.h"
 #include "asc_parser.h"
 #include "can_socket.h"
+#include "config.h"
 
 int main(int argc, char** argv)
 {
-    // Use default files and interface
-    std::string dbc_file = "dbc/test.dbc";
-    std::string log_file = "log_input/event.asc";
-    std::string ifname = "vcan0";
-    std::string exclude_sender = "ChassisBus";
-    std::string program_log = "replay_output/replay_program.log";
+    // Init config
+    ReplayConfig cfg;
 
-    DbcParser dbc(dbc_file);
+    if (!loadConfig("config/cfg_replay.json", cfg)) {
+        return 1;
+    }
+
+    DbcParser dbc(cfg.dbc_file);
     AscParser asc;
-    CanSocket can(ifname);
+    CanSocket can(cfg.ifname);
 
-    std::ifstream fin(log_file);
+    std::ifstream fin(cfg.log_file);
+    std::ofstream flog(cfg.program_log);
+
+    std::string exclude_sender = cfg.exclude_sender;
     if (!fin) {
-        std::cerr << "Failed open log file: " << log_file << "\n";
+        std::cerr << "Failed open log file: " << cfg.log_file << "\n";
         return 2;
     }
 
-    std::ofstream flog(program_log);
     if (!flog) {
-        std::cerr << "Failed open program log: " << program_log << "\n";
+        std::cerr << "Failed open program log: " << cfg.program_log << "\n";
         return 2;
     }
 
